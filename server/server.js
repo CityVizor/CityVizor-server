@@ -12,6 +12,13 @@ var config = require("./config/config.js");
 var app = express();
 console.log("Express running in " + app.get('env') + " environment");
 
+// set cors so that we can access from localhost
+var cors = require("cors");
+app.use(cors());
+
+// polyfill before express allows for async middleware
+require('express-async-errors');
+
 if (config.server.compression) {
 	var compression = require('compression');
 	app.use(compression());
@@ -22,7 +29,7 @@ var bodyParser = require("body-parser");
 app.use(bodyParser.json({})); // support json encoded bodies
 app.use(bodyParser.urlencoded({
 	extended: true,
-	limit: "500kb"
+	limit: "10000kb"
 })); // support urlencoded bodies
 
 const db = require("./db")();
@@ -50,7 +57,7 @@ acl.config(aclOptions);
 /* SET UP ROUTES */
 app.use("/api", require("./routers/api"));
 
-//app.use("/api/search",require("./routers/search"));
+app.use("/api/search",require("./routers/search"));
 
 app.use("/exports/v1", require("./routers/exports-v1"));
 
