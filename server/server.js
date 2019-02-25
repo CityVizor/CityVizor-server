@@ -25,18 +25,7 @@ app.use(bodyParser.urlencoded({
 	limit: "500kb"
 })); // support urlencoded bodies
 
-var mongoose = require('mongoose');
-mongoose.plugin(require('mongoose-write-stream'));
-mongoose.plugin(require('mongoose-paginate'));
-mongoose.Promise = global.Promise;
-mongoose.connect('mongodb://localhost/' + config.database.db)
-	.then(() => console.log("Connected to database " + config.database.db))
-	.catch(err => {
-		throw new Error("Error when connectiong to DB " + config.database.db + ": " + err.message); // if not connected the app will not throw any errors when accessing DB models, better to fail hard and fix
-	});
-
-
-
+const db = require("./db")();
 
 // configure express-jwt
 var jwt = require('express-jwt');
@@ -57,14 +46,6 @@ var aclOptions = {
 	logConsole: true
 }
 acl.config(aclOptions);
-
-/* Mongo Express Database viewer */
-if (config.mongoExpress.enable) {
-	var mongo_express = require('mongo-express/lib/middleware');
-	var mongo_express_config = require('./config/mongo-express-config.js');
-	app.use('/db', mongo_express(mongo_express_config))
-	console.log("Mongo Express accessible at /db");
-}
 
 /* SET UP ROUTES */
 app.use("/api", require("./routers/api"));
