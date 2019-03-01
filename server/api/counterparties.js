@@ -8,39 +8,23 @@ var acl = require("express-dynacl");
 
 var etlFilter = require("../middleware/etl-filter");
 
-// load schemas
-var Counterparty = require("../models/counterparty");
-var Payment = require("../models/payment");
+const { sequelize, Record, Counterparty } = require("../db");
+const Op = require("sequelize").Op;
 
 // REQUEST: get event
 
-router.get("/search", etlFilter({visible:true}), acl("counterparty","list"), (req,res,next) => {
+router.get("/search", /*etlFilter({visible:true}), acl("counterparty","list"),*/ async (req,res,next) => {
 
-  var match = {};
-
-  var query = Counterparty.aggregate([
-    {
-      $match: {
-        $or: [
-          {$text: {$search: req.query.query}},
-          {counterpartyId: req.query.query}
-        ],
-        etl: {$in: req.etls}
-      }
-    },
-    { $group: {
-      _id : "$counterpartyId",
-      "name": {$first: "$name"}      
-    } },
-    { $limit: 10 },
-    { $project: {
-      "counterpartyId": "$_id",
-      "name":"$name"
-    } }
-  ]);
-
-  query.then(counterparties => res.json(counterparties)).catch(err => next(err));
-
+  console.log("searching... " + req.query.search);
+  
+  const query = Counterparty.findAll({
+    attributes: ["id","name"],
+    where: {
+      name: { [Op.like]: `%${req.query.search}%` }
+    }
+  });
+  
+  res.json(await query);
 });
 
 router.get("/top", etlFilter({visible:true}), acl("counterparty","list"), async (req,res,next) => {

@@ -1,33 +1,21 @@
 
 const config = require("./config");
 
-module.exports = function(){
+console.log("Connecting to database " + config.database.db);
 
-  console.log("Connecting to database " + config.database.db);
+const Sequelize = require('sequelize');
+const sequelize = new Sequelize(config.database.db, config.database.username, config.database.password, {
+  host: config.database.host,
+  dialect: 'mysql'  
+});
 
-  const Sequelize = require('sequelize');
-  const sequelize = new Sequelize(config.database.db, config.database.username, config.database.password, {
-    host: config.database.host,
-    dialect: 'mysql'
-  });
+// import all model defs from models
+const modelDefs = require("./models-sql");
+const models = Object.entries(modelDefs)
+.map(entry => [entry[0], sequelize.import(entry[0], entry[1])])
+.reduce((acc,cur) => { acc[cur[0]] = cur[1]; return acc; }, {});
 
-  const Event = sequelize.define('event', {
-    srcId: Sequelize.STRING,
-    name: Sequelize.STRING,
-    description: Sequelize.STRING
-  });
-
-  const Accounting = sequelize.define('record', {
-    "type": Sequelize.STRING,
-    "paragraph": Sequelize.STRING,
-    "item": Sequelize.STRING,
-    "event": Sequelize.STRING,
-    "amount": Sequelize.DECIMAL(10, 2),
-    "date": Sequelize.DATE,
-    "counterpartyId": Sequelize.STRING,
-    "counterpartyName": Sequelize.STRING,
-    "description": Sequelize.STRING,
-  });
-
-  return sequelize.sync().then(() => console.log("Connected."));
-}
+module.exports = {
+  ...models,
+  sequelize
+};

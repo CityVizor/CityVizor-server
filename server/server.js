@@ -32,7 +32,9 @@ app.use(bodyParser.urlencoded({
 	limit: "10000kb"
 })); // support urlencoded bodies
 
-const db = require("./db")();
+const db = require("./db");
+
+db.sequelize.sync().then(() => console.log(`Database synchronized`));
 
 // configure express-jwt
 var jwt = require('express-jwt');
