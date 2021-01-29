@@ -54,7 +54,7 @@
     "xml2js": "^0.4.19"
   },
   "devDependencies": {
-    "mongo-express": "^0.44.0",
+    "mongo-express": "^0.54.0",
     "nodemon": "^1.18.9"
   },
   "author": "Martin Kopecek <martin.kopecek@smallhill.cz>",
