@@ -26,7 +26,7 @@
     "compression": "^1.7.3",
     "cors": "^2.8.5",
     "cron": "^1.6.0",
-    "csv-parse": "^2.5.0",
+    "csv-parse": "^4.4.6",
     "express": "^4.16.4",
     "express-async-errors": "^3.1.1",
     "express-dynacl": "^1.0.0",
